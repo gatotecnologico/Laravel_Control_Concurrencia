@@ -1,17 +1,22 @@
+<?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class Modelo extends Model
 {
+    private $denominaciones = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
     protected $table = 'caja';
     public $timestamps = false;
     protected $primaryKey = ['id_sucursal', 'denominacion'];
     public $incrementing = false;
 
-    protected $fillable = ['id_sucursal', 'denominacion', 'existencia', 'entregados'];
-
-    private static $denominaciones = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
+    protected $fillable = [
+        'denominacion',
+        'existencia',
+        'entregados'
+    ];
 
     public static function abrirCaja($id_sucursal)
     {
