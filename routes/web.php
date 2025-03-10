@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\BranchController;
-use App\Http\Controllers\TellerController;
+use App\Http\Controllers\BranchesController;
+use App\Http\Controllers\TellersController;
 
-Route::get('/', [BranchController::class, 'index']);
-Route::put('/{id}/abrir', [TellerController::class], 'abrirCaja');
+Route::get('/', [BranchesController::class, 'index']);
+Route::get('/{cajero}', [TellersController::class, 'abrirCaja'])->name('teller.abrirCaja');;

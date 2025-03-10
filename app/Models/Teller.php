@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Teller extends Model
 {
-    private $denominaciones = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
+    private $denominaciones;
+
+    public function __construct() {
+        $this->denominaciones = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
+    }
+
     protected $guarded = [];
 
     public function branch() {
@@ -20,17 +25,17 @@ class Teller extends Model
             return;
         }
 
-        foreach (self::$denominaciones as $denominacion) {
+        foreach ($this->denominaciones as $denominacion) {
             self::create([
-                'id_sucursal' => $cajero->id_sucursal,
-                'denominacion' => $denominacion,
-                'existencia' => rand(5, 20),
-                'entregados' => 0,
-                'abierta' => true,
-                $cajero->save(),
+                'sucursal_id' => $cajero->sucursal_id,
+                'denominacion' => $cajero->denominacion = $denominacion,
+                'existencia' => $cajero->existencia = rand(5, 20),
+                'entregados' => $cajero->entregados = 0,
+                'abierta' => $cajero->abierta = true,
             ]);
+            $cajero->save();
         }
 
-        return dd(Teller::all());
+    return dd(Teller::all());
     }
 }

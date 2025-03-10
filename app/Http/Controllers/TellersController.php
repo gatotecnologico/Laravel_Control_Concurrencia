@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 use App\Models\Teller;
 use Illuminate\Http\Request;
 
-class TellerController extends Controller
+class TellersController extends Controller
 {
-    public function abrirCaja(int $id) {
-        $cajero = Teller::findOrFail($id);
-        $cajero->abrirCaja($id);
+    public function abrirCaja($cajero) {
+        $cajero = Teller::find($cajero);
+        $cajero->abrirCaja($cajero);
+
+        // return response()->json($cajero, 200);;
     }
 }
