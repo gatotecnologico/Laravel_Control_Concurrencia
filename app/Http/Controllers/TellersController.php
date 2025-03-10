@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 use App\Models\Teller;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 
 class TellersController extends Controller
 {
-    public function abrirCaja($cajero) {
-        $cajero = Teller::find($cajero);
-        $cajero->abrirCaja($cajero);
-
-        // return response()->json($cajero, 200);;
+    public function abrirCaja($sucursal_id) {
+        $sucursal = Branch::find($sucursal_id);
+        $cajero = new Teller();
+        $cajero->abrirCaja($sucursal, $cajero);
     }
 }

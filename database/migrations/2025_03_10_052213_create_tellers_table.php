@@ -12,15 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tellers', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('sucursal_id');
+            $table->id('sucursal');
             $table->integer('denominacion')->default(0);
             $table->integer('entregados')->default(0);
             $table->integer('existencia')->default(0);
-            $table->boolean('abierta')->default(false);
+
+            $table->primary(['sucursal', 'denominacion']);
 
             $table->timestamps();
-            $table->index('sucursal_id');
         });
     }
 
