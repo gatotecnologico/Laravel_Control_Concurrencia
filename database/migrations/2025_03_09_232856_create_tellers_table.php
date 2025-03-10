@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('tellers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('sucursal_id');
-            $table->int('denominacion');
-            $table->int('entregados');
-            $table->int('existencia');
+            $table->integer('denominacion')->default(0);
+            $table->integer('entregados')->default(0);
+            $table->integer('existencia')->default(0);
+            $table->boolean('abierta')->default(false);
 
             $table->timestamps();
             $table->index('sucursal_id');

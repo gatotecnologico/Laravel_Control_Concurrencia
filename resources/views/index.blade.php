@@ -28,17 +28,19 @@
                     </div>
 
                     <div class="space-y-4">
-                        <button id="btnAbrirCaja" 
+                        <form method="POST" action="">
+                            <button id="btnAbrirCaja"
                             class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:shadow-lg flex items-center justify-center">
                             <i class="fas fa-cash-register mr-2"></i>
                             Abrir Caja
-                        </button>
-                        <button id="btnAgregarBilletes" 
+                            </button>
+                        </form>
+                        <button id="btnAgregarBilletes"
                             class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:shadow-lg flex items-center justify-center">
                             <i class="fas fa-money-bill-wave mr-2"></i>
                             Agregar Billetes
                         </button>
-                        <button id="btnCanjearCheque" 
+                        <button id="btnCanjearCheque"
                             class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:shadow-lg flex items-center justify-center">
                             <i class="fas fa-money-check mr-2"></i>
                             Canjear Cheque

@@ -6,9 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Branch extends Model
 {
-    protected $fillable = [
-        'name',
-    ];
+    protected $guarded = [];
 
     public function tellers() {
         return $this -> hasOne(Teller::class);
