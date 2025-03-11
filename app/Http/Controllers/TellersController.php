@@ -14,8 +14,17 @@ class TellersController extends Controller
     }
 
     public function agregarBilletes($sucursal_id) {
-        $sucursal = Branch::find($sucursal_id);
+        $sucursal = Branch::firstOrCreate(
+            ['id' => $sucursal_id],
+            [
+                'abierta' => false,
+                'nombre' => 'Sucursal ' . $sucursal_id
+            ]
+        );
+    
         $cajero = new Teller();
         $cajero->agregarBilletes($sucursal);
+        
+        return redirect()->back()->with('message', 'Billetes agregados exitosamente');
     }
 }

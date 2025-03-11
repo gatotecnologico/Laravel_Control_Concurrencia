@@ -34,7 +34,7 @@
             <!-- Status Message -->
             <div class="mb-8">
                 <div class="bg-gray-900 border-l-4 border-purple-500 p-4 rounded-lg" id="mensaje" role="alert">
-                    <p class="text-gray-300"></p>
+                    <p class="text-gray-300">{{ session('message') }}</p>
                 </div>
             </div>
 
@@ -42,6 +42,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <form method="GET" action="{{ route('teller.abrirCaja', ['sucursal' => 1]) }}" class="md:col-span-2">
                     @csrf
+                    <input type="hidden" name="_redirect" value="{{ url()->current() }}">
                     <button type="submit" 
                         class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-lg font-bold py-4 px-6 rounded-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl flex items-center justify-center space-x-3">
                         <i class="fas fa-cash-register text-2xl"></i>
@@ -51,6 +52,7 @@
 
                 <form method="POST" action="{{ route('teller.agregarBilletes', ['sucursal' => 1]) }}">
                     @csrf
+                    <input type="hidden" name="_redirect" value="{{ url()->current() }}">
                     <button type="submit" 
                         class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-lg font-bold py-4 px-6 rounded-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl flex items-center justify-center space-x-3">
                         <i class="fas fa-money-bill-wave text-2xl"></i>
