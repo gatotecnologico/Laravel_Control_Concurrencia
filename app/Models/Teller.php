@@ -23,19 +23,17 @@ class Teller extends Model
 
     public function abrirCaja($sucursal, $cajero) {
         $abierta = filter_var(request('abierta'), FILTER_VALIDATE_BOOLEAN);
-
-        if($abierta === true) {
-            return;
+        if($abierta === 0) {
+            foreach ($this->denominaciones as $denominacion) {
+                self::upsert([
+                    'sucursal' => $sucursal->id,
+                    'denominacion' => $denominacion,
+                    'existencia' => rand(5, 20),
+                    'entregados' => 0,
+                ], ['sucursal', 'denominacion'], ['existencia', 'entregados']);
+            }
+            $sucursal->abierta = true;
+            $sucursal->save();
         }
-        foreach ($this->denominaciones as $denominacion) {
-            self::upsert([
-                'sucursal' => $sucursal->id,
-                'denominacion' => $denominacion,
-                'existencia' => rand(5, 20),
-                'entregados' => 0,
-            ], ['sucursal', 'denominacion'], ['existencia', 'entregados']);
-        }
-        $sucursal->abierta = true;
-        $sucursal->save();
     }
 }
