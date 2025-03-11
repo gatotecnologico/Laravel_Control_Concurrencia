@@ -27,7 +27,7 @@ class Teller extends Model
     {
         $abierta = filter_var(request('abierta'), FILTER_VALIDATE_BOOLEAN);
 
-        if ($abierta === true) {
+        if($abierta === true) {
             return;
         }
         foreach ($this->denominaciones as $denominacion) {
@@ -40,21 +40,5 @@ class Teller extends Model
         }
         $sucursal->abierta = true;
         $sucursal->save();
-    }
-
-    public function agregarBilletes($sucursal)
-    {
-        foreach ($this->denominaciones as $denominacion) {
-            $actual = self::where('sucursal', $sucursal->id)
-                ->where('denominacion', $denominacion)
-                ->first();
-
-            self::upsert([
-                'sucursal' => $sucursal->id,
-                'denominacion' => $denominacion,
-                'existencia' => ($actual ? $actual->existencia : 0) + rand(5, 20),
-                'entregados' => $actual ? $actual->entregados : 0,
-            ], ['sucursal', 'denominacion'], ['existencia']);
-        }
     }
 }
