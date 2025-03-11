@@ -5,4 +5,4 @@ use App\Http\Controllers\BranchesController;
 use App\Http\Controllers\TellersController;
 
 Route::get('/', [BranchesController::class, 'index']);
-Route::get('/{sucursal}', [TellersController::class, 'abrirCaja'])->name('teller.abrirCaja');;
+Route::get('/{sucursal}', [TellersController::class, 'abrirCaja'])->name('teller.abrirCaja');

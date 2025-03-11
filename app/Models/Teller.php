@@ -22,7 +22,7 @@ class Teller extends Model
     protected $guarded = [];
 
     public function abrirCaja($sucursal, $cajero) {
-        $abierta = filter_var(request('abierta'), FILTER_VALIDATE_BOOLEAN);
+        $abierta = $sucursal->abierta;
         if($abierta === 0) {
             foreach ($this->denominaciones as $denominacion) {
                 self::upsert([
