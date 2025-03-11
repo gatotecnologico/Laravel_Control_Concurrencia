@@ -12,4 +12,10 @@ class TellersController extends Controller
         $cajero = new Teller();
         $cajero->abrirCaja($sucursal, $cajero);
     }
+
+    public function agregarBilletes($sucursal_id) {
+        $sucursal = Branch::find($sucursal_id);
+        $cajero = new Teller();
+        $cajero->agregarBilletes($sucursal);
+    }
 }
