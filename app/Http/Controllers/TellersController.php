@@ -10,8 +10,8 @@ class TellersController extends Controller
     public function abrirCaja($sucursal_id) {
         $sucursal = Branch::find($sucursal_id);
         $cajero = new Teller();
-        $cajero->abrirCaja($sucursal, $cajero);
-        return redirect()->back()->with('message', 'Caja Abierta Exitosamente');
+        $mensaje = $cajero->abrirCaja($sucursal, $cajero);
+        return redirect()->back()->with('message', $mensaje);
     }
 
     public function agregarBilletes($sucursal_id) {
