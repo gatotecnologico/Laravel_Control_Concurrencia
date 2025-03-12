@@ -22,13 +22,11 @@ class Teller extends Model
         return $this->belongsTo(Branch::class);
     }
 
-    protected $guarded = [];
-
     public function abrirCaja($sucursal) {
         $sucursal_id = $sucursal->id;
         if($sucursal->abierta === 0) {
             foreach ($this->denominaciones as $denominacion) {
-                $existencia = rand(5, 20);
+                $existencia = rand(1, 2);
                 $this->db->generarExistencias($sucursal_id, $denominacion, $existencia, $sucursal);
             }
             return 'Caja Abierta Exitosamente';
