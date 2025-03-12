@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
+use App\Database\ServiciosTecnicos;
 use Illuminate\Database\Eloquent\Model;
 
 class Teller extends Model
 {
-    private $denominaciones = [];
     protected $primaryKey = ['sucursal', 'denominacion'];
     public $incrementing = false;
     protected $fillable = ['sucursal', 'denominacion'];
 
     public function __construct()
     {
+        $this->db = new ServiciosTecnicos();
         $this->denominaciones = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
     }
 
@@ -23,38 +24,27 @@ class Teller extends Model
 
     protected $guarded = [];
 
-    public function abrirCaja($sucursal, $cajero) {
-        $abierta = $sucursal->abierta;
-        if($abierta === 0) {
+    public function abrirCaja($sucursal) {
+        $sucursal_id = $sucursal->id;
+        if($sucursal->abierta === 0) {
             foreach ($this->denominaciones as $denominacion) {
-                self::upsert([
-                    'sucursal' => $sucursal->id,
-                    'denominacion' => $denominacion,
-                    'existencia' => rand(5, 20),
-                    'entregados' => 0,
-                ], ['sucursal', 'denominacion'], ['existencia', 'entregados']);
+                $existencia = rand(5, 20);
+                $this->db->generarExistencias($sucursal_id, $denominacion, $existencia, $sucursal);
             }
-            $sucursal->abierta = true;
-            $sucursal->save();
             return 'Caja Abierta Exitosamente';
-        }   else if($abierta === 1) {
+        }   else if($sucursal->abierta === 1) {
             return 'No se puede volver a abrir la caja';
         }
     }
 
     public function agregarBilletes($sucursal)
-     {
-         foreach ($this->denominaciones as $denominacion) {
-             $actual = self::where('sucursal', $sucursal->id)
-                 ->where('denominacion', $denominacion)
-                 ->first();
-
-             self::upsert([
-                 'sucursal' => $sucursal->id,
-                 'denominacion' => $denominacion,
-                 'existencia' => ($actual ? $actual->existencia : 0) + rand(5, 20),
-                 'entregados' => $actual ? $actual->entregados : 0,
-             ], ['sucursal', 'denominacion'], ['existencia']);
-         }
-     }
+    {
+        $sucursal_id = $sucursal->id;
+        foreach ($this->denominaciones as $denominacion)
+        {
+            $existencia = rand(5, 20);
+            $this->db->agregarBilletes($sucursal_id, $denominacion, $existencia);
+        }
+        return 'Billetes agregados exitosamente';
+    }
 }

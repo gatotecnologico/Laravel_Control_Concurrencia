@@ -6,7 +6,7 @@
         <!-- Header Card -->
         <div class="bg-gray-800 rounded-t-2xl shadow-lg p-6 border-b-2 border-purple-500">
             <h1 class="text-3xl font-bold text-center text-white">Sistema de Control de Caja</h1>
-            <p class="text-center text-gray-400 mt-2">Gestión de Efectivo y Transacciones</p>
+            <p class="text-center font-bold text-purple-400 mt-2">"{{ $sucursal->name }}"</p>
         </div>
 
         <!-- Main Content -->
