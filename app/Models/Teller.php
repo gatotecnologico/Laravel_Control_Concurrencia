@@ -47,4 +47,25 @@ class Teller extends Model
         }
         return 'Billetes agregados exitosamente';
     }
+
+    public function cambiarCheque($sucursal, $importe)
+    {
+        if (!$sucursal->abierta) {
+            return ['error' => 'La caja debe estar abierta para realizar esta operación'];
+        }
+
+        $resultado = $this->db->cambiarCheque($sucursal->id, $importe);
+
+        if (isset($resultado['error'])) {
+            return $resultado;
+        }
+
+        $mensaje = "Cheque cambiado exitosamente por $importe\n";
+        $mensaje .= "Billetes entregados:\n";
+        foreach ($resultado['billetes'] as $denominacion => $cantidad) {
+            $mensaje .= "$cantidad billetes de $$denominacion\n";
+        }
+
+        return ['success' => true, 'message' => $mensaje];
+    }
 }

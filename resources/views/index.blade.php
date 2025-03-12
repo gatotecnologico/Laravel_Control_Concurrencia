@@ -60,13 +60,31 @@
                     </button>
                 </form>
 
-                <button type="button"
-                    class="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white text-lg font-bold py-4 px-6 rounded-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl flex items-center justify-center space-x-3">
-                    <i class="fas fa-money-check text-2xl"></i>
-                    <span>Canjear Cheque</span>
-                </button>
+                <form method="POST" action="{{ route('teller.cambiarCheque', ['sucursal' => 1]) }}">
+                    @csrf
+                    <input type="hidden" name="_redirect" value="{{ url()->current() }}">
+                    <input type="hidden" name="monto" id="montoHidden">
+                    <button type="submit" onclick="setMonto(event)"
+                        class="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white text-lg font-bold py-4 px-6 rounded-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl flex items-center justify-center space-x-3">
+                        <i class="fas fa-money-check text-2xl"></i>
+                        <span>Canjear Cheque</span>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+function setMonto(event) {
+    event.preventDefault();
+    const monto = document.getElementById('monto').value;
+    if (!monto || monto <= 0) {
+        document.querySelector('#mensaje p').textContent = 'Por favor ingrese un monto válido';
+        return;
+    }
+    document.getElementById('montoHidden').value = monto;
+    event.target.closest('form').submit();
+}
+</script>
 @endsection
