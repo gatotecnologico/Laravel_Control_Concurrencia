@@ -26,7 +26,7 @@ class Teller extends Model
         $sucursal_id = $sucursal->id;
         if($sucursal->abierta === 0) {
             foreach ($this->denominaciones as $denominacion) {
-                $existencia = rand(1, 2);
+                $existencia = rand(5, 20);
                 $this->db->generarExistencias($sucursal_id, $denominacion, $existencia, $sucursal);
             }
             return 'Caja Abierta Exitosamente';
@@ -52,8 +52,7 @@ class Teller extends Model
             return ['error' => 'La caja debe estar abierta para realizar esta operación'];
         }
 
-        $resultado = $this->db->cambiarCheque($sucursal->id, $importe);
-
+        $resultado = $this->db->cambiarCheque($sucursal->id, $importe, array_reverse($this->denominaciones));
         if (isset($resultado['error'])) {
             return $resultado;
         }

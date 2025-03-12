@@ -38,13 +38,12 @@ class ServiciosTecnicos extends Model
         }
     }
 
-    public function cambiarCheque($sucursal_id, $importe)
+    public function cambiarCheque($sucursal_id, $importe, $denominaciones)
     {
         if ($importe <= 0) {
             return ['error' => 'El importe debe ser mayor a cero'];
         }
 
-        $denominaciones = [1000, 500, 200, 100, 50, 20, 10, 5, 2, 1];
         $billetes_entregar = [];
         $importe_restante = $importe;
 
@@ -54,39 +53,32 @@ class ServiciosTecnicos extends Model
             ->get()
             ->keyBy('denominacion');
 
-            DB::beginTransaction();
-            try {
-                foreach ($denominaciones as $denominacion) {
-                    if (empty($billetes[$denominacion]) || $billetes[$denominacion]->existencia <= 0) {
-                        continue;
-                    }
+        DB::beginTransaction();
+        try {
+            foreach ($denominaciones as $denominacion) {
+                $cantidad = min(floor($importe_restante / $denominacion), $billetes[$denominacion]->existencia);
 
-                    $cantidad = min(floor($importe_restante / $denominacion), $billetes[$denominacion]->existencia);
+                if ($cantidad > 0) {
+                    $billetes_entregar[$denominacion] = $cantidad;
+                    $importe_restante -= $denominacion * $cantidad;
 
-                    if ($cantidad > 0) {
-                        $billetes_entregar[$denominacion] = $cantidad;
-                        $importe_restante -= $denominacion * $cantidad;
-
-                        DB::table('tellers')
-                            ->where('sucursal', $sucursal_id)
-                            ->where('denominacion', $denominacion)
-                            ->decrement('existencia', $cantidad, ['entregados' => DB::raw("entregados + $cantidad")]);
-                    }
+                    DB::table('tellers')
+                        ->where('sucursal', $sucursal_id)
+                        ->where('denominacion', $denominacion)
+                        ->decrement('existencia', $cantidad, ['entregados' => DB::raw("entregados + $cantidad")]);
                 }
-
-                if ($importe_restante > 0) {
-                    DB::rollBack();
-                    return ['error' => 'No hay denominaciones disponibles para entregar el monto exacto'];
-                }
-                DB::commit();
-                return [
-                    'success' => true,
-                    'billetes' => $billetes_entregar,
-                    'total' => $importe
-                ];
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return ['error' => 'Error durante el canje del cheque: ' . $e->getMessage()];
             }
+
+            if ($importe_restante > 0) {
+                DB::rollBack();
+                return ['error' => 'No hay denominaciones disponibles para entregar el monto exacto'];
+            }
+
+            DB::commit();
+            return ['success' => true, 'billetes' => $billetes_entregar, 'total' => $importe];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ['error' => 'Error durante el canje del cheque: ' . $e->getMessage()];
         }
+    }
 }
