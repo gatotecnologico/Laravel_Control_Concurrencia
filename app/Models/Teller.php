@@ -26,7 +26,7 @@ class Teller extends Model
         $sucursal_id = $sucursal->id;
         if($sucursal->abierta === 0) {
             foreach ($this->denominaciones as $denominacion) {
-                $existencia = rand(5, 20);
+                $existencia = rand(1, 5);
                 $this->db->generarExistencias($sucursal_id, $denominacion, $existencia, $sucursal);
             }
             return 'Caja Abierta Exitosamente';
@@ -44,7 +44,7 @@ class Teller extends Model
         $sucursal_id = $sucursal->id;
         foreach ($this->denominaciones as $denominacion)
         {
-            $existencia = rand(5, 20);
+            $existencia = rand(1, 5);
             $this->db->agregarBilletes($sucursal_id, $denominacion, $existencia);
         }
         return 'Billetes agregados exitosamente';

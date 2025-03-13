@@ -33,20 +33,32 @@ class ServiciosTecnicos extends Model
 
     public function agregarBilletes($sucursal_id, $denominacion, $existencia)
     {
-        $actual = DB::table('tellers')->where('sucursal', $sucursal_id)->where('denominacion', $denominacion)->first();
-        if ($actual) {
-            DB::table('tellers')->where('sucursal', $sucursal_id)->where('denominacion', $denominacion)
-                ->update([
-                    'existencia' => $actual->existencia + $existencia,
-                    'entregados' => $actual->entregados,
+        try {
+            DB::beginTransaction();
+            $actual = DB::table('tellers')
+                ->where('sucursal', $sucursal_id)
+                ->where('denominacion', $denominacion)
+                ->lockForUpdate()
+                ->first();
+
+            if ($actual) {
+                DB::table('tellers')->where('sucursal', $sucursal_id)->where('denominacion', $denominacion)
+                    ->update([
+                        'existencia' => $actual->existencia + $existencia,
+                        'entregados' => $actual->entregados,
+                    ]);
+            } else {
+                DB::table('tellers')->insert([
+                    'sucursal' => $sucursal_id,
+                    'denominacion' => $denominacion,
+                    'existencia' => $existencia,
+                    'entregados' => 0,
                 ]);
-        } else {
-            DB::table('tellers')->insert([
-                'sucursal' => $sucursal_id,
-                'denominacion' => $denominacion,
-                'existencia' => $existencia,
-                'entregados' => 0,
-            ]);
+            }
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            return 'Error, la transaccion falló';
         }
     }
 
@@ -63,11 +75,11 @@ class ServiciosTecnicos extends Model
         DB::beginTransaction();
         try {
             $billetes = DB::table('tellers')
-            ->where('sucursal', $sucursal_id)
-            ->whereIn('denominacion', $denominaciones)
-            ->lockForUpdate()
-            ->get()
-            ->keyBy('denominacion');
+                ->where('sucursal', $sucursal_id)
+                ->whereIn('denominacion', $denominaciones)
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('denominacion');
 
             foreach ($denominaciones as $denominacion) {
                 $cantidad = min(floor($importe_restante / $denominacion), $billetes[$denominacion]->existencia);
