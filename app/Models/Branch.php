@@ -11,4 +11,12 @@ class Branch extends Model
     public function tellers() {
         return $this -> hasOne(Teller::class);
     }
+
+    public function getBranch($sucursal_id) {
+        $sucursal = Branch::firstOrCreate(
+            ['id' => $sucursal_id],
+            ['abierta' => false]
+        );
+        return $sucursal;
+    }
 }
