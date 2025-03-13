@@ -62,9 +62,14 @@ class Teller extends Model
         }
 
         $mensaje = "Cheque cambiado exitosamente por $importe\n";
-        $mensaje .= "Billetes entregados:\n";
+        $mensaje .= "Pesos:\n";
+
         foreach ($resultado['billetes'] as $denominacion => $cantidad) {
-            $mensaje .= "$cantidad billetes de $$denominacion\n";
+            if ($denominacion < 100) {
+                $mensaje .= "$cantidad monedas de $$denominacion, ";
+            } else {
+                $mensaje .= "$cantidad billetes de $$denominacion, ";
+            }
         }
 
         return ['success' => true, 'message' => $mensaje];
