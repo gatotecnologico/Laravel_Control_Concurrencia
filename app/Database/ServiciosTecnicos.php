@@ -2,6 +2,7 @@
 
 namespace App\Database;
 
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,14 +10,26 @@ class ServiciosTecnicos extends Model
 {
     public function generarExistencias($sucursal_id, $denominacion, $existencia, $sucursal)
     {
-        DB::table('tellers')->insert([
-            'sucursal' => $sucursal_id,
-            'denominacion' => $denominacion,
-            'existencia' => $existencia,
-            'entregados' => 0,
-        ]);
-        $sucursal->abierta = true;
-        $sucursal->save();
+        DB::beginTransaction();
+        try {
+            DB::table('tellers')
+                ->where('sucursal', $sucursal_id)
+                ->lockForUpdate()->first();
+
+            DB::table('tellers')->insert([
+                'sucursal' => $sucursal_id,
+                'denominacion' => $denominacion,
+                'existencia' => $existencia,
+                'entregados' => 0,
+            ]);
+            $sucursal->abierta = 1;
+            $sucursal->save();
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            return 'Error, la transaccion falló';
+        }
+
     }
 
     public function agregarBilletes($sucursal_id, $denominacion, $existencia)

@@ -37,6 +37,10 @@ class Teller extends Model
 
     public function agregarBilletes($sucursal)
     {
+        if ($sucursal->abierta === 0) {
+            return 'La caja debe estar abierta para realizar esta operación';
+        }
+
         $sucursal_id = $sucursal->id;
         foreach ($this->denominaciones as $denominacion)
         {
@@ -48,7 +52,7 @@ class Teller extends Model
 
     public function cambiarCheque($sucursal, $importe)
     {
-        if (!$sucursal->abierta) {
+        if ($sucursal->abierta === 0) {
             return ['error' => 'La caja debe estar abierta para realizar esta operación'];
         }
 
