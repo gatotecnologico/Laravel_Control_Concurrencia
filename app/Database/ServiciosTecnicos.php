@@ -10,8 +10,8 @@ class ServiciosTecnicos extends Model
 {
     public function generarExistencias($sucursal_id, $denominacion, $existencia, $sucursal)
     {
-        DB::beginTransaction();
         try {
+            DB::beginTransaction();
             DB::table('tellers')
                 ->where('sucursal', $sucursal_id)
                 ->lockForUpdate()->first();
@@ -29,7 +29,6 @@ class ServiciosTecnicos extends Model
             DB::rollBack();
             return 'Error, la transaccion falló';
         }
-
     }
 
     public function agregarBilletes($sucursal_id, $denominacion, $existencia)
@@ -51,23 +50,25 @@ class ServiciosTecnicos extends Model
         }
     }
 
-    public function cambiarCheque($sucursal_id, $importe, $denominaciones)
+    public function cambiarCheque($sucursal_id, $importe)
     {
         if ($importe <= 0) {
             return ['error' => 'El importe debe ser mayor a cero'];
         }
 
+        $denominaciones = [1000, 500, 200, 100, 50, 20, 10, 5, 2, 1];
         $billetes_entregar = [];
         $importe_restante = $importe;
 
-        $billetes = DB::table('tellers')
+        DB::beginTransaction();
+        try {
+            $billetes = DB::table('tellers')
             ->where('sucursal', $sucursal_id)
             ->whereIn('denominacion', $denominaciones)
+            ->lockForUpdate()
             ->get()
             ->keyBy('denominacion');
 
-        DB::beginTransaction();
-        try {
             foreach ($denominaciones as $denominacion) {
                 $cantidad = min(floor($importe_restante / $denominacion), $billetes[$denominacion]->existencia);
 
