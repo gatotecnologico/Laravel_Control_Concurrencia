@@ -4,9 +4,8 @@ namespace App\Database;
 
 use Exception;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Model;
 
-class ServiciosTecnicos extends Model
+class ServiciosTecnicos
 {
     public function generarExistencias($sucursal_id, $denominacion, $existencia, $sucursal)
     {
@@ -37,7 +36,6 @@ class ServiciosTecnicos extends Model
             DB::beginTransaction();
             $actual = DB::table('tellers')
                 ->where('sucursal', $sucursal_id)
-                ->where('denominacion', $denominacion)
                 ->lockForUpdate()
                 ->first();
 
