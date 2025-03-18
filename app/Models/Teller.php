@@ -57,9 +57,6 @@ class Teller extends Model
             return ['error' => 'La caja debe estar abierta para realizar esta operación'];
         }
 
-        if ($importe <= 0) {
-            return ['error' => 'El importe debe ser mayor a cero'];
-        }
 
         // Obtener los billetes disponibles en la sucursal
         $resultado = $this->db->obtenerBilletes($sucursal->id);
@@ -102,7 +99,7 @@ class Teller extends Model
             $mensaje = "Cheque cambiado exitosamente por $$importe\n";
             $mensaje .= "Desglose:\n";
             foreach ($billetes_entregar as $denominacion => $cantidad) {
-                $tipo = $denominacion >= 100 ? "billetes" : "monedas";
+                $tipo = $denominacion >= 20 ? "billetes" : "monedas";
                 $mensaje .= "$cantidad $tipo de $$denominacion\n";
             }
 
