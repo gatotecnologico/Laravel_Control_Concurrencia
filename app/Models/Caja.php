@@ -6,7 +6,7 @@ use App\Database\ServiciosTecnicos;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
-class Teller extends Model
+class Caja extends Model
 {
     protected $primaryKey = ['sucursal', 'denominacion'];
     public $incrementing = false;
@@ -18,9 +18,9 @@ class Teller extends Model
         $this->denominaciones = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
     }
 
-    public function branch()
+    public function sucursales()
     {
-        return $this->belongsTo(Branch::class);
+        return $this->belongsTo(Sucursal::class);
     }
 
     public function abrirCaja($sucursal)
@@ -57,8 +57,6 @@ class Teller extends Model
             return ['error' => 'La caja debe estar abierta para realizar esta operación'];
         }
 
-
-        // Obtener los billetes disponibles en la sucursal
         $resultado = $this->db->obtenerBilletes($sucursal->id);
 
         if (isset($resultado['error'])) {
@@ -66,7 +64,7 @@ class Teller extends Model
         }
 
         $denominaciones = [1000, 500, 200, 100, 50, 20, 10, 5, 2, 1];
-        $billetes = collect($resultado['billetes'])->keyBy('denominacion'); // Indexar por denominación
+        $billetes = collect($resultado['billetes'])->keyBy('denominacion');
         $billetes_entregar = [];
         $importe_restante = $importe;
 
@@ -80,7 +78,7 @@ class Teller extends Model
                         $billetes_entregar[$denominacion] = $cantidad;
                         $importe_restante -= $denominacion * $cantidad;
 
-                        DB::table('tellers')
+                        DB::table('cajas')
                             ->where('sucursal', $sucursal->id)
                             ->where('denominacion', $denominacion)
                             ->decrement('existencia', $cantidad, ['entregados' => DB::raw("entregados + $cantidad")]);
@@ -95,7 +93,6 @@ class Teller extends Model
 
             DB::commit();
 
-            // Construir el mensaje de éxito
             $mensaje = "Cheque cambiado exitosamente por $$importe\n";
             $mensaje .= "Desglose:\n";
             foreach ($billetes_entregar as $denominacion => $cantidad) {

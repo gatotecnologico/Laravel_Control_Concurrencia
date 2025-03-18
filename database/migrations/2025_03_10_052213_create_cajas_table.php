@@ -11,10 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('branches', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->integer('abierta')->default(0);
+        Schema::create('cajas', function (Blueprint $table) {
+            $table->id('sucursal');
+            $table->integer('denominacion')->default(0);
+            $table->integer('entregados')->default(0);
+            $table->integer('existencia')->default(0);
+
+            $table->primary(['sucursal', 'denominacion']);
+
             $table->timestamps();
         });
     }
@@ -24,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('branches');
+        Schema::dropIfExists('cajas');
     }
 };

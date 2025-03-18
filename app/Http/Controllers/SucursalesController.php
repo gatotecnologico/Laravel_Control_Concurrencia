@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Branch;
+use App\Models\Sucursal;
 use Illuminate\Http\Request;
 
-class BranchesController extends Controller
+class SucursalesController extends Controller
 {
     public function index()
     {
-        $sucursal = Branch::find(1);
+        $sucursal = Sucursal::find(1);
         return view('index', ['sucursal'=>$sucursal]);
     }
 }

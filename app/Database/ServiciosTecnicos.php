@@ -11,11 +11,11 @@ class ServiciosTecnicos
     {
         try {
             DB::beginTransaction();
-            DB::table('tellers')
+            DB::table('cajas')
                 ->where('sucursal', $sucursal_id)
                 ->lockForUpdate()->first();
 
-            DB::table('tellers')->insert([
+            DB::table('cajas')->insert([
                 'sucursal' => $sucursal_id,
                 'denominacion' => $denominacion,
                 'existencia' => $existencia,
@@ -34,19 +34,19 @@ class ServiciosTecnicos
     {
         try {
             DB::beginTransaction();
-            $actual = DB::table('tellers')
+            $actual = DB::table('cajas')
                 ->where('sucursal', $sucursal_id)
                 ->lockForUpdate()
                 ->first();
 
             if ($actual) {
-                DB::table('tellers')->where('sucursal', $sucursal_id)->where('denominacion', $denominacion)
+                DB::table('cajas')->where('sucursal', $sucursal_id)->where('denominacion', $denominacion)
                     ->update([
                         'existencia' => $actual->existencia + $existencia,
                         'entregados' => $actual->entregados,
                     ]);
             } else {
-                DB::table('tellers')->insert([
+                DB::table('cajas')->insert([
                     'sucursal' => $sucursal_id,
                     'denominacion' => $denominacion,
                     'existencia' => $existencia,
@@ -65,7 +65,7 @@ class ServiciosTecnicos
         $denominaciones = [1000, 500, 200, 100, 50, 20, 10, 5, 2, 1];
 
         try {
-            $billetes = DB::table('tellers')
+            $billetes = DB::table('cajas')
                 ->where('sucursal', $sucursal_id)
                 ->whereIn('denominacion', $denominaciones)
                 ->get();
