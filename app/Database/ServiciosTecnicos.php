@@ -43,15 +43,7 @@ class ServiciosTecnicos
                 DB::table('cajas')->where('sucursal', $sucursal_id)->where('denominacion', $denominacion)
                     ->update([
                         'existencia' => $actual->existencia + $existencia,
-                        'entregados' => $actual->entregados,
                     ]);
-            } else {
-                DB::table('cajas')->insert([
-                    'sucursal' => $sucursal_id,
-                    'denominacion' => $denominacion,
-                    'existencia' => $existencia,
-                    'entregados' => 0,
-                ]);
             }
             DB::commit();
         } catch (Exception $e) {
