@@ -9,25 +9,14 @@ class ServiciosTecnicos
 {
     public function generarExistencias($sucursal_id, $denominacion, $existencia, $sucursal)
     {
-        try {
-            DB::beginTransaction();
-            DB::table('cajas')
-                ->where('sucursal', $sucursal_id)
-                ->lockForUpdate()->first();
-
-            DB::table('cajas')->insert([
-                'sucursal' => $sucursal_id,
-                'denominacion' => $denominacion,
-                'existencia' => $existencia,
-                'entregados' => 0,
-            ]);
-            $sucursal->abierta = 1;
-            $sucursal->save();
-            DB::commit();
-        } catch (Exception $e) {
-            DB::rollBack();
-            return 'Error, la transaccion falló';
-        }
+        DB::table('cajas')->insert([
+            'sucursal' => $sucursal_id,
+            'denominacion' => $denominacion,
+            'existencia' => $existencia,
+            'entregados' => 0,
+        ]);
+        $sucursal->abierta = 1;
+        $sucursal->save();
     }
 
     public function agregarBilletes($sucursal_id, $denominacion, $existencia)

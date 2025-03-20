@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Database\ServiciosTecnicos;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Exception;
 
 class Caja extends Model
 {
@@ -28,16 +28,26 @@ class Caja extends Model
 
     public function abrirCaja($sucursal)
     {
-        $sucursal_id = $sucursal->id;
-        if ($sucursal->abierta === 0) {
-            foreach ($this->denominaciones as $denominacion) {
-                $existencia = rand(1, 5);
-                self::$db->generarExistencias($sucursal_id, $denominacion, $existencia, $sucursal);
+        try {
+            self::$db->getBeginTran();
+            self::$db->bloquearCaja($sucursal);
+            $sucursal_id = $sucursal->id;
+            if ($sucursal->abierta === 0) {
+                foreach ($this->denominaciones as $denominacion) {
+                    $existencia = rand(1, 5);
+                    self::$db->generarExistencias($sucursal_id, $denominacion, $existencia, $sucursal);
+                }
+                self::$db->getCommit();
+                return 'Caja Abierta Exitosamente';
+            } else if ($sucursal->abierta === 1) {
+                self::$db->getRollback();
+                return 'No se puede volver a abrir la caja';
             }
-            return 'Caja Abierta Exitosamente';
-        } else if ($sucursal->abierta === 1) {
-            return 'No se puede volver a abrir la caja';
+        } catch (Exception $e) {
+            self::$db->getRollback();
+            return 'Error, la transaccion falló';
         }
+
     }
 
     public function agregarBilletes($sucursal)
