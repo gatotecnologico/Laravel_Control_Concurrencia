@@ -11,10 +11,13 @@ class Caja extends Model
     protected $primaryKey = ['sucursal', 'denominacion'];
     public $incrementing = false;
     protected $fillable = ['sucursal', 'denominacion'];
+    private static $db;
 
     public function __construct()
     {
-        $this->db = new ServiciosTecnicos();
+        if(self::$db === null){
+            self::$db = new ServiciosTecnicos();
+        }
         $this->denominaciones = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
     }
 
@@ -29,7 +32,7 @@ class Caja extends Model
         if ($sucursal->abierta === 0) {
             foreach ($this->denominaciones as $denominacion) {
                 $existencia = rand(1, 5);
-                $this->db->generarExistencias($sucursal_id, $denominacion, $existencia, $sucursal);
+                self::$db->generarExistencias($sucursal_id, $denominacion, $existencia, $sucursal);
             }
             return 'Caja Abierta Exitosamente';
         } else if ($sucursal->abierta === 1) {
@@ -46,7 +49,7 @@ class Caja extends Model
         $sucursal_id = $sucursal->id;
         foreach ($this->denominaciones as $denominacion) {
             $existencia = rand(1, 5);
-            $this->db->agregarBilletes($sucursal_id, $denominacion, $existencia);
+            self::$db->agregarBilletes($sucursal_id, $denominacion, $existencia);
         }
         return 'Billetes agregados exitosamente';
     }
@@ -57,7 +60,7 @@ class Caja extends Model
             return ['error' => 'La caja debe estar abierta para realizar esta operación'];
         }
 
-        $resultado = $this->db->obtenerBilletes($sucursal->id);
+        $resultado = self::$db->obtenerBilletes($sucursal->id);
 
         if (isset($resultado['error'])) {
             return $resultado;
@@ -68,8 +71,9 @@ class Caja extends Model
         $billetes_entregar = [];
         $importe_restante = $importe;
 
-        DB::beginTransaction();
+        self::$db->getBeginTran();
         try {
+            self::$db->bloquearCaja($sucursal);
             foreach ($denominaciones as $denominacion) {
                 if (isset($billetes[$denominacion])) {
                     $cantidad = min(floor($importe_restante / $denominacion), $billetes[$denominacion]->existencia);
@@ -78,20 +82,17 @@ class Caja extends Model
                         $billetes_entregar[$denominacion] = $cantidad;
                         $importe_restante -= $denominacion * $cantidad;
 
-                        DB::table('cajas')
-                            ->where('sucursal', $sucursal->id)
-                            ->where('denominacion', $denominacion)
-                            ->decrement('existencia', $cantidad, ['entregados' => DB::raw("entregados + $cantidad")]);
+                       self::$db->actualizarBilletes($sucursal, $denominacion, $cantidad);
                     }
                 }
             }
 
             if ($importe_restante > 0) {
-                DB::rollBack();
+                self::$db->getRollback();
                 return ['error' => 'No hay denominaciones disponibles para entregar el monto exacto'];
             }
 
-            DB::commit();
+            self::$db->getCommit();
 
             $mensaje = "Cheque cambiado exitosamente por $$importe\n";
             $mensaje .= "Desglose:\n";
@@ -102,7 +103,7 @@ class Caja extends Model
 
             return ['success' => true, 'message' => $mensaje];
         } catch (\Exception $e) {
-            DB::rollBack();
+            $this->db->getRollback();
             return ['error' => 'Error durante el canje del cheque: ' . $e->getMessage()];
         }
     }

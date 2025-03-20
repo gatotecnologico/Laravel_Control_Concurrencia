@@ -42,7 +42,7 @@ class ServiciosTecnicos
             if ($actual) {
                 DB::table('cajas')->where('sucursal', $sucursal_id)->where('denominacion', $denominacion)
                     ->update([
-                        'existencia' => $actual->existencia + $existencia,
+                        'existencia' => DB::raw("existencia + $existencia"),
                     ]);
             }
             DB::commit();
@@ -57,14 +57,44 @@ class ServiciosTecnicos
         $denominaciones = [1000, 500, 200, 100, 50, 20, 10, 5, 2, 1];
 
         try {
+            DB::beginTransaction();
             $billetes = DB::table('cajas')
                 ->where('sucursal', $sucursal_id)
                 ->whereIn('denominacion', $denominaciones)
+                ->lockForUpdate()
                 ->get();
 
+            DB::commit();
             return ['success' => true, 'billetes' => $billetes];
         } catch (\Exception $e) {
+            DB::rollBack();
             return ['error' => 'Error al obtener los billetes: ' . $e->getMessage()];
         }
+    }
+
+    public function getBeginTran() {
+        return DB::beginTransaction();
+    }
+
+    public function getRollback() {
+        return DB::rollBack();
+    }
+
+    public function getCommit() {
+        DB::commit();
+    }
+
+    public function actualizarBilletes($sucursal, $denominacion, $cantidad) {
+        DB::table('cajas')
+        ->where('sucursal', $sucursal->id)
+        ->where('denominacion', $denominacion)
+        ->decrement('existencia', $cantidad, ['entregados' => DB::raw("entregados + $cantidad")]);
+    }
+
+    public function bloquearCaja($sucursal) {
+        DB::table('cajas')
+        ->where('sucursal', $sucursal->id)
+        ->lockForUpdate()
+        ->get();
     }
 }
